@@ -184,19 +184,22 @@ function bp_groupblogs_refetch() {
 	$last_refetch = groups_get_groupmeta( $bp->groups->current_group->id, 'bp_groupblogs_lastupdate' );
 	if ( strtotime( gmdate( "Y-m-d H:i:s" ) ) >= strtotime( '+30 minutes', strtotime( $last_refetch ) ) )
 		add_action( 'wp_footer', 'bp_groupblogs_refetch' );
-	/* Refetch the latest group twitter posts via AJAX so we don't stall a page load. */
-	function _bp_groupblogs_refetch() {
-		global $bp; ?>
-		<script type="text/javascript">
-			jQuery(document).ready( function() {
-				jQuery.post( ajaxurl, {
-					action: 'refetch_groupblogs',
-					'cookie': encodeURIComponent(document.cookie),
-					'group_id': <?php echo $bp->groups->current_group->id ?>
+
+	if ( ! function_exists( '_bp_groupblogs_refetch' ) ) {
+		/* Refetch the latest group twitter posts via AJAX so we don't stall a page load. */
+		function _bp_groupblogs_refetch() {
+			global $bp; ?>
+			<script type="text/javascript">
+				jQuery(document).ready( function() {
+					jQuery.post( ajaxurl, {
+						action: 'refetch_groupblogs',
+						'cookie': encodeURIComponent(document.cookie),
+						'group_id': <?php echo $bp->groups->current_group->id ?>
+					});
 				});
-			});
-		</script><?php
-		groups_update_groupmeta( $bp->groups->current_group->id, 'bp_groupblogs_lastupdate', gmdate( "Y-m-d H:i:s" ) );
+			</script><?php
+			groups_update_groupmeta( $bp->groups->current_group->id, 'bp_groupblogs_lastupdate', gmdate( "Y-m-d H:i:s" ) );
+		}
 	}
 }
 add_action( 'groups_screen_group_home', 'bp_groupblogs_refetch' );
