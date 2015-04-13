@@ -180,7 +180,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			/* Re-fetch */
 			bp_groupblogs_fetch_group_feeds( bp_get_current_group_id() );
 			bp_core_add_message( __( 'External blog feeds updated successfully!', 'bp-groups-externalblogs' ) );
-			bp_core_redirect( bp_get_group_permalink( $bp->groups->current_group ) . '/admin/' . $this->slug );
+			bp_core_redirect( bp_get_group_permalink( groups_get_current_group() ) . '/admin/' . $this->slug );
 		}
 		/* We don't need display functions since the group activity stream handles it all. */
 		function display( $group_id = null ) {}
@@ -192,14 +192,19 @@ if ( class_exists('BP_Group_Extension' ) ) {
 	function bp_groupblogs_fetch_group_feeds( $group_id = false ) {
 		global $bp;
 
-		if ( empty( $group_id ) )
+		if ( empty( $group_id ) ) {
 			$group_id = bp_get_current_group_id();
-		if ( $group_id == bp_get_current_group_id() )
-			$group = $bp->groups->current_group;
-		else
+		}
+
+		if ( $group_id == bp_get_current_group_id() ) {
+			$group = groups_get_current_group();
+		} else {
 			$group = new BP_Groups_Group( $group_id );
-		if ( !$group )
+		}
+
+		if ( !$group ) {
 			return false;
+		}
 
 		$group_blogs = groups_get_groupmeta( $group_id, 'blogfeeds' );
 
@@ -403,3 +408,29 @@ function bp_groupblogs_avatar_id($var) {
 
 }
 add_action( 'bp_get_activity_avatar_item_id', 'bp_groupblogs_avatar_id');
+
+/**
+ * Use the RSS feed's primary link instead of native BP activity permalink.
+ *
+ * @since 1.6.0
+ *
+ * @param  string $retval   Activity permalink
+ * @param  object $activity Activity data for the current activity item.
+ * @return string
+ */
+function bp_groupblogs_filter_get_permalink( $retval, $activity ) {
+	if ( 'groups' !== $activity->component ) {
+		return $retval;
+	}
+
+	if ( 'exb' !== $activity->type ) {
+		return $retval;
+	}
+
+	if ( ! empty( $activity->primary_link ) ) {
+		$retval = esc_url( $activity->primary_link );
+	}
+
+	return $retval;
+}
+add_filter( 'bp_activity_get_permalink', 'bp_groupblogs_filter_get_permalink', 10, 2 );
