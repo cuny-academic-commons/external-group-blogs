@@ -1,14 +1,13 @@
 === BuddyPress External Group Blogs ===
 Contributors: apeatling, modemlooper, boonebgorges, cuny-academic-commons
 Tags: buddypress, groups, blogs, external-blogs, feeds, aggregation
-Requires at least: WordPress 2.9.1 / BuddyPress 1.5
-Tested up to: WordPress 3.5 / BuddyPress 1.6.3
-Stable Tag: 1.5.1
+Requires at least: WordPress 3.5 / BuddyPress 1.7
+Tested up to: WordPress 4.1.x / BuddyPress 2.2.x
+Stable Tag: 1.5.2
 
 == Description ==
 
-Give group creators and administrators on your BuddyPress install the ability to attach
-external blog RSS feeds to groups.
+Give group creators and administrators on your BuddyPress install the ability to attach external blog RSS feeds to groups.
 
 Blog posts will appear within the activity stream for the group.
 
@@ -22,6 +21,13 @@ New posts will automatically be pulled every hour, or every 30 minutes if someon
  4. Blogs can be added to an existing group by visiting that group's admin menu.
 
 == Changelog ==
+
+= 1.6.0 =
+* Better RSS validation before parsing a feed
+* Record the RSS guid as activity meta for better unique detection to prevent duplicate activity items
+* Record the RSS URL as activity meta to deal with deleting a specific RSS feed from a group
+* Use the RSS postlink when recording the activity's primary_link
+* Fix strict standards notices
 
 = 1.5.2 =
 * Fixes potential fatal error due to dynamic function redeclaration
