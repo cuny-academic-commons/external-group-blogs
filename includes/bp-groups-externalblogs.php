@@ -380,7 +380,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 // Add a filter option groups avatar
 function bp_groupblogs_avatar_type($var) {
-	global $activities_template, $bp;
+	global $activities_template;
 
 	if ( $activities_template->activity->type == "exb" ) {
 		return 'group';
@@ -393,7 +393,7 @@ add_action( 'bp_get_activity_avatar_object_activity', 'bp_groupblogs_avatar_type
 
 
 function bp_groupblogs_avatar_id($var) {
-	global $activities_template, $bp;
+	global $activities_template;
 
 	if ( $activities_template->activity->type == "exb" ) {
 		return $activities_template->activity->item_id;
