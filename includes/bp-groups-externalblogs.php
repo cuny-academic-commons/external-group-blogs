@@ -50,7 +50,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 				<span class="desc"><?php _e( "Seperate URL's with commas.", 'bp-groups-externalblogs' ) ?></span>
 				<label for="blogfeeds"><?php _e( "Feed URL's:", 'bp-groups-externalblogs' ) ?></label>
-				<textarea name="blogfeeds" id="blogfeeds"><?php echo attribute_escape( implode( ', ', (array) groups_get_groupmeta( $bp->groups->current_group->id, 'blogfeeds' ) ) ) ?></textarea>
+				<textarea name="blogfeeds" id="blogfeeds"><?php echo esc_textarea( implode( ', ', (array) groups_get_groupmeta( $bp->groups->current_group->id, 'blogfeeds' ) ) ) ?></textarea>
 			</p>
 			<?php
 			wp_nonce_field( 'groups_create_save_' . $this->slug );
@@ -112,7 +112,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			<span class="desc"><?php _e( "Enter RSS feed URL's for blogs you would like to attach to this group. Any future posts on these blogs will show on the group activity stream. Seperate URL's with commas.", 'bp-groups-externalblogs' ) ?></span>
 			<p>
 				<label for="blogfeeds"><?php _e( "Feed URL's:", 'bp-groups-externalblogs' ) ?></label>
-				<textarea name="blogfeeds" id="blogfeeds"><?php echo attribute_escape( implode( ', ', (array) groups_get_groupmeta( $bp->groups->current_group->id, 'blogfeeds' ) ) );  ?></textarea>
+				<textarea name="blogfeeds" id="blogfeeds"><?php echo esc_textarea( implode( ', ', (array) groups_get_groupmeta( $bp->groups->current_group->id, 'blogfeeds' ) ) );  ?></textarea>
 			</p>
 			<input type="submit" name="save" value="<?php _e( "Update Feed URL's", 'bp-groups-externalblogs' ) ?>" />
 			<?php
@@ -259,7 +259,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 		/* Record found blog posts in activity streams */
 		foreach ( (array) $items as $post_date => $post ) {
 
-			$activity_action = sprintf( __( 'Blog: %s from %s in the group %s', 'bp-groups-externalblogs' ), '<a class="feed-link" href="' . esc_attr( $post['link'] ) . '">' . esc_attr( $post['title'] ) . '</a>', '<a class="feed-author" href="' . esc_attr( $post['blogurl'] ) . '">' . attribute_escape( $post['blogname'] ) . '</a>', '<a href="' . bp_get_group_permalink( $group ) . '">' . attribute_escape( $group->name ) . '</a>' );
+			$activity_action = sprintf( __( 'Blog: %s from %s in the group %s', 'bp-groups-externalblogs' ), '<a class="feed-link" href="' . esc_attr( $post['link'] ) . '">' . esc_attr( $post['title'] ) . '</a>', '<a class="feed-author" href="' . esc_attr( $post['blogurl'] ) . '">' . esc_attr( $post['blogname'] ) . '</a>', '<a href="' . bp_get_group_permalink( $group ) . '">' . esc_attr( $group->name ) . '</a>' );
 
 			$activity_content = '<div>' . strip_tags( bp_create_excerpt( $post['description'], 175 ) ) . '</div>';
 			$activity_content = apply_filters( 'bp_groupblogs_activity_content', $activity_content, $post, $group );
