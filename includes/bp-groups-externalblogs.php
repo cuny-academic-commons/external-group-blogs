@@ -50,7 +50,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 				<span class="desc"><?php _e( "Seperate URL's with commas.", 'bp-groups-externalblogs' ) ?></span>
 				<label for="blogfeeds"><?php _e( "Feed URL's:", 'bp-groups-externalblogs' ) ?></label>
-				<textarea name="blogfeeds" id="blogfeeds"><?php echo esc_textarea( implode( ', ', (array) groups_get_groupmeta( bp_get_current_group_id(), 'blogfeeds' ) ) ) ?></textarea>
+				<textarea name="blogfeeds" id="blogfeeds"><?php echo implode( ', ', array_map( 'esc_url', (array) groups_get_groupmeta( bp_get_current_group_id(), 'blogfeeds' ) ) ); ?></textarea>
 			</p>
 			<?php
 			wp_nonce_field( 'groups_create_save_' . $this->slug );
@@ -65,8 +65,9 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 			foreach( (array) $unfiltered_feeds as $blog_feed ) {
 
-				if ( !empty( $blog_feed ) )
-					$blog_feeds[] = trim( $blog_feed );
+				if ( ! empty( $blog_feed ) ) {
+					$blog_feeds[] = esc_url_raw( trim( $blog_feed ) );
+				}
 
 			}
 			groups_update_groupmeta( bp_get_current_group_id(), 'fetchtime', $_POST['fetch-time'] );
@@ -112,7 +113,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			<span class="desc"><?php _e( "Enter RSS feed URL's for blogs you would like to attach to this group. Any future posts on these blogs will show on the group activity stream. Seperate URL's with commas.", 'bp-groups-externalblogs' ) ?></span>
 			<p>
 				<label for="blogfeeds"><?php _e( "Feed URL's:", 'bp-groups-externalblogs' ) ?></label>
-				<textarea name="blogfeeds" id="blogfeeds"><?php echo esc_textarea( implode( ', ', (array) groups_get_groupmeta( bp_get_current_group_id(), 'blogfeeds' ) ) );  ?></textarea>
+				<textarea name="blogfeeds" id="blogfeeds"><?php echo implode( ', ', array_map( 'esc_url', (array) groups_get_groupmeta( bp_get_current_group_id(), 'blogfeeds' ) ) ); ?></textarea>
 			</p>
 			<input type="submit" name="save" value="<?php _e( "Update Feed URL's", 'bp-groups-externalblogs' ) ?>" />
 			<?php
@@ -129,14 +130,16 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			$existing_feeds = (array) groups_get_groupmeta( bp_get_current_group_id(), 'blogfeeds' );
 			$unfiltered_feeds = explode( ',', $_POST['blogfeeds'] );
 			foreach( (array) $unfiltered_feeds as $blog_feed ) {
-				if ( !empty( $blog_feed ) )
-					$blog_feeds[] = trim( $blog_feed );
+				if ( ! empty( $blog_feed ) ) {
+					$blog_feeds[] = esc_url_raw( trim( $blog_feed ) );
+				}
 			}
 			/* Loop and find any feeds that have been removed, so we can delete activity stream items */
-			if ( !empty( $existing_feeds ) ) {
+			if ( ! empty( $existing_feeds ) ) {
 				foreach( (array) $existing_feeds as $feed ) {
-					if ( !in_array( $feed, (array) $blog_feeds ) )
+					if ( ! in_array( $feed, (array) $blog_feeds ) ) {
 						$removed[] = $feed;
+					}
 				}
 			}
 			if ( $removed  ) {
