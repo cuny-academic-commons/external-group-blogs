@@ -12,33 +12,39 @@ Contributors: apeatling, modemlooper, boonebgorges
 Author URI: http://profiles.wordpress.org/apeatling/
 */
 
-/* Only load the plugin functions if BuddyPress is loaded and initialized. */
+/**
+ * Only load the plugin functions if BuddyPress is loaded and initialized.
+ */
 function bp_groupblogs_init() {
 	require( dirname( __FILE__ ) . '/includes/bp-groups-externalblogs.php' );
 }
 add_action( 'bp_init', 'bp_groupblogs_init' );
 
-
-/*** Load translations for this plugin */
+/**
+ * Load translations for this plugin.
+ */
 function bp_groupblogs_load_translations() {
 	load_plugin_textdomain( 'bp-groups-externalblogs', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 }
 add_action( 'plugins_loaded', 'bp_groupblogs_load_translations' );
 
-
-/* On activation register the cron to refresh external blog posts. */
+/**
+ * On activation, register our cron hook to refresh external blog posts.
+ */
 function bp_groupblogs_activate() {
 	wp_schedule_event( time(), 'hourly', 'bp_groupblogs_cron' );
 }
 register_activation_hook( __FILE__, 'bp_groupblogs_activate' );
 
-
-/* On deacativation, clear the cron. */
+/**
+ * On deactivation, clear the cron and delete all group RSS activity.
+ */
 function bp_groupblogs_deactivate() {
 	wp_clear_scheduled_hook( 'bp_groupblogs_cron' );
 
 	/* Remove all external blog activity */
-	if ( function_exists( 'bp_activity_delete' ) )
+	if ( function_exists( 'bp_activity_delete' ) ) {
 		bp_activity_delete( array( 'type' => 'exb' ) );
+	}
 }
 register_deactivation_hook( __FILE__, 'bp_groupblogs_deactivate' );
