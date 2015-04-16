@@ -205,7 +205,11 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 	bp_register_group_extension( 'Group_External_Blogs' );
 
-
+	/**
+	 * Function to fetch group feeds and save RSS entries as BP activity items.
+	 *
+	 * @param int $group_id The group ID.
+	 */
 	function bp_groupblogs_fetch_group_feeds( $group_id = false ) {
 		if ( empty( $group_id ) ) {
 			$group_id = bp_get_current_group_id();
@@ -338,7 +342,9 @@ if ( class_exists('BP_Group_Extension' ) ) {
 		return $items;
 	}
 
-	/* Add a filter option to the filter select box on group activity pages */
+	/**
+	 * Add an option to the activity filter dropdown menu for our group RSS items.
+	 */
 	function bp_groupblogs_add_filter() {
 	?>
 
@@ -349,7 +355,9 @@ if ( class_exists('BP_Group_Extension' ) ) {
 	add_action( 'bp_group_activity_filter_options', 'bp_groupblogs_add_filter' );
 	add_action( 'bp_activity_filter_options', 'bp_groupblogs_add_filter' );
 
-	/* Fetch group  posts after 30 mins expires and someone hits the group page */
+	/**
+	 * Refetch RSS feeds after a certain interval when a user visits a group.
+	 */
 	function bp_groupblogs_refetch() {
 		$last_refetch = groups_get_groupmeta( bp_get_current_group_id(), 'bp_groupblogs_lastupdate' );
 		$meta = groups_get_groupmeta( bp_get_current_group_id(), 'fetchtime' );
@@ -363,7 +371,9 @@ if ( class_exists('BP_Group_Extension' ) ) {
 	}
 	add_action( 'groups_screen_group_home', 'bp_groupblogs_refetch' );
 
-	/* Refetch the latest group posts via AJAX so we don't stall a page load. */
+	/**
+	 * Refetch RSS feeds via AJAX in the footer of a group homepage.
+	 */
 	function _bp_groupblogs_refetch() {
 		groups_update_groupmeta( bp_get_current_group_id(), 'bp_groupblogs_lastupdate', gmdate( "Y-m-d H:i:s" ) );
 	?>
@@ -382,12 +392,17 @@ if ( class_exists('BP_Group_Extension' ) ) {
 	<?php
 	}
 
-	/* Refresh via an AJAX post for the group */
+	/**
+	 * AJAX handler for {@link _bp_groupblogs_refetch()}.
+	 */
 	function bp_groupblogs_ajax_refresh() {
 		bp_groupblogs_fetch_group_feeds( $_POST['group_id'] );
 	}
 	add_action( 'wp_ajax_refetch_groupblogs', 'bp_groupblogs_ajax_refresh' );
 
+	/**
+	 * Cron hook to refetch all RSS feeds for all groups.
+	 */
 	function bp_groupblogs_cron_refresh() {
 		global $bp, $wpdb;
 
@@ -401,7 +416,12 @@ if ( class_exists('BP_Group_Extension' ) ) {
 }
 
 
-// Add a filter option groups avatar
+/**
+ * Force the avatar for group RSS items to the current group.
+ *
+ * @param  string $var Current avatar type.
+ * @return string
+ */
 function bp_groupblogs_avatar_type( $var ) {
 	global $activities_template;
 
@@ -414,6 +434,12 @@ function bp_groupblogs_avatar_type( $var ) {
 add_action( 'bp_get_activity_avatar_object_groups', 'bp_groupblogs_avatar_type');
 add_action( 'bp_get_activity_avatar_object_activity', 'bp_groupblogs_avatar_type');
 
+/**
+ * Force the avatar ID for group RSS items to the current group.
+ *
+ * @param  string $var Current avatar item ID.
+ * @return int
+ */
 function bp_groupblogs_avatar_id( $var ) {
 	global $activities_template;
 
