@@ -5,8 +5,6 @@ if ( class_exists('BP_Group_Extension' ) ) {
 	class Group_External_Blogs extends BP_Group_Extension {
 
 		function __construct() {
-			global $bp;
-
 			$this->name = __( 'External Blogs', 'bp-groups-externalblogs' );
 			$this->slug = 'external-blog-feeds';
 			$this->create_step_position = 21;
@@ -15,10 +13,8 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 
 		function create_screen( $group_id = null ) {
-			global $bp;
 			if ( !bp_is_group_creation_step( $this->slug ) )
 				return false;
-
 
 			$times = array( '10', '15', '20', '30', '60' );
 
@@ -58,8 +54,6 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 
 		public function create_screen_save( $group_id = null ) {
-			global $bp;
-
 			check_admin_referer( 'groups_create_save_' . $this->slug );
 			$unfiltered_feeds = explode( ',', $_POST['blogfeeds'] );
 
@@ -79,8 +73,6 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 
 		function edit_screen( $group_id = null ) {
-			global $bp;
-
 			if ( !bp_is_group_admin_screen( $this->slug ) )
 				return false;
 
@@ -122,8 +114,6 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 
 		function edit_screen_save( $group_id = null ) {
-			global $bp;
-
 			if ( !isset( $_POST['save'] ) )
 				return false;
 			check_admin_referer( 'groups_edit_save_' . $this->slug );
@@ -146,7 +136,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 				foreach( (array) $removed as $feed ) {
 					$existing = bp_activity_get( array(
 						'user_id' => false,
-						'component' => $bp->groups->id,
+						'component' => 'groups',
 						'type' => 'exb',
 						'item_id' => bp_get_current_group_id(),
 						'update_meta_cache' => false,
@@ -170,7 +160,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 					} else {
 						bp_activity_delete( array(
 							'item_id' => bp_get_current_group_id(),
-							'component' => $bp->groups->id,
+							'component' => 'groups',
 							'type' => 'exb'
 						) );
 					}
@@ -193,8 +183,6 @@ if ( class_exists('BP_Group_Extension' ) ) {
 	bp_register_group_extension( 'Group_External_Blogs' );
 
 	function bp_groupblogs_fetch_group_feeds( $group_id = false ) {
-		global $bp;
-
 		if ( empty( $group_id ) ) {
 			$group_id = bp_get_current_group_id();
 		}
@@ -274,13 +262,13 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 			/* Fetch an existing activity_id if one exists. */
 			// backpat
-			$id = bp_activity_get_activity_id( array( 'user_id' => false, 'action' => $activity_action, 'component' => $bp->groups->id, 'type' => 'exb', 'item_id' => $group_id, 'secondary_item_id' => wp_hash( $post['blogurl'] ) ) );
+			$id = bp_activity_get_activity_id( array( 'user_id' => false, 'action' => $activity_action, 'component' => 'groups', 'type' => 'exb', 'item_id' => $group_id, 'secondary_item_id' => wp_hash( $post['blogurl'] ) ) );
 
 			// new method
 			if ( empty( $id ) ) {
 				$existing = bp_activity_get( array(
 					'user_id' => false,
-					'component' => $bp->groups->id,
+					'component' => 'groups',
 					'type' => 'exb',
 					'item_id' => $group_id,
 					'update_meta_cache' => false,
@@ -331,8 +319,6 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 	/* Fetch group  posts after 30 mins expires and someone hits the group page */
 	function bp_groupblogs_refetch() {
-		global $bp;
-
 		$last_refetch = groups_get_groupmeta( bp_get_current_group_id(), 'bp_groupblogs_lastupdate' );
 		$meta = groups_get_groupmeta( bp_get_current_group_id(), 'fetchtime' );
 
@@ -347,7 +333,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 	/* Refetch the latest group posts via AJAX so we don't stall a page load. */
 	function _bp_groupblogs_refetch() {
-		global $bp; ?>
+	?>
 
 		<script type="text/javascript">
 			jQuery(document).ready( function() {
