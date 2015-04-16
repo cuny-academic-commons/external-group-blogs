@@ -3,7 +3,7 @@ Contributors: apeatling, modemlooper, boonebgorges, cuny-academic-commons
 Tags: buddypress, groups, blogs, external-blogs, feeds, aggregation
 Requires at least: WordPress 3.5 / BuddyPress 1.7
 Tested up to: WordPress 4.1.x / BuddyPress 2.2.x
-Stable Tag: 1.5.2
+Stable Tag: 1.6.0
 
 == Description ==
 
@@ -24,6 +24,7 @@ New posts will automatically be pulled every hour, or every 30 minutes if someon
 
 = 1.6.0 =
 * Better RSS validation before parsing a feed
+* Update a group's RSS feeds when a user visits the group homepage after a certain, configurable interval
 * Record the RSS guid as activity meta for better unique detection to prevent duplicate activity items
 * Record the RSS URL as activity meta to deal with deleting a specific RSS feed from a group
 * Use the RSS postlink when recording the activity's primary_link
