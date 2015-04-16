@@ -3,7 +3,6 @@
 if ( class_exists('BP_Group_Extension' ) ) {
 
 	class Group_External_Blogs extends BP_Group_Extension {
-
 		function __construct() {
 			$this->name = __( 'External Blogs', 'bp-groups-externalblogs' );
 			$this->slug = 'external-blog-feeds';
@@ -11,10 +10,10 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			$this->enable_nav_item = false;
 		}
 
-
 		function create_screen( $group_id = null ) {
-			if ( !bp_is_group_creation_step( $this->slug ) )
+			if ( ! bp_is_group_creation_step( $this->slug ) ) {
 				return false;
+			}
 
 			$times = array( '10', '15', '20', '30', '60' );
 
@@ -33,9 +32,8 @@ if ( class_exists('BP_Group_Extension' ) ) {
 				echo "<option value='$time' $selected>$time</option>";
 			}
 			echo "</select>  ";
+		?>
 
-
-			?>
 			<p><?php _e(
 				"Add RSS feeds of blogs you'd like to attach to this group in the box below.
 				 Any future posts on these blogs will show up on the group page and be recorded
@@ -48,37 +46,38 @@ if ( class_exists('BP_Group_Extension' ) ) {
 				<label for="blogfeeds"><?php _e( "Feed URL's:", 'bp-groups-externalblogs' ) ?></label>
 				<textarea name="blogfeeds" id="blogfeeds"><?php echo implode( ', ', array_map( 'esc_url', (array) groups_get_groupmeta( bp_get_current_group_id(), 'blogfeeds' ) ) ); ?></textarea>
 			</p>
-			<?php
-			wp_nonce_field( 'groups_create_save_' . $this->slug );
-		}
 
+			<?php wp_nonce_field( 'groups_create_save_' . $this->slug ); ?>
+
+		<?php
+		}
 
 		public function create_screen_save( $group_id = null ) {
 			check_admin_referer( 'groups_create_save_' . $this->slug );
+
 			$unfiltered_feeds = explode( ',', $_POST['blogfeeds'] );
-
 			foreach( (array) $unfiltered_feeds as $blog_feed ) {
-
 				if ( ! empty( $blog_feed ) ) {
 					$blog_feeds[] = esc_url_raw( trim( $blog_feed ) );
 				}
-
 			}
+
 			groups_update_groupmeta( bp_get_current_group_id(), 'fetchtime', $_POST['fetch-time'] );
 			groups_update_groupmeta( bp_get_current_group_id(), 'blogfeeds', $blog_feeds );
 			groups_update_groupmeta( bp_get_current_group_id(), 'bp_groupblogs_lastupdate', gmdate( "Y-m-d H:i:s" ) );
+
 			/* Fetch */
 			bp_groupblogs_fetch_group_feeds( bp_get_current_group_id() );
 		}
 
-
 		function edit_screen( $group_id = null ) {
-			if ( !bp_is_group_admin_screen( $this->slug ) )
+			if ( ! bp_is_group_admin_screen( $this->slug ) ) {
 				return false;
+			}
 
 			$meta = groups_get_groupmeta( bp_get_current_group_id(), 'fetchtime' );
 
-			$fetch = !empty( $meta ) ? $meta : '30' ;
+			$fetch = ! empty( $meta ) ? $meta : '30' ;
 
 			$times = array( '10', '15', '20', '30', '60' );
 
@@ -89,18 +88,13 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			$default = __( 'Default', 'buddysuite' );
 
 			echo "<option value='30'>$default</option>";
-
 			foreach( $times as $time ) {
-
 				$selected = ( $fetch == $time ) ? 'selected="selected"' : '';
 
 				echo "<option value='$time' $selected>$time</option>";
 			}
 			echo "</select></p>";
-
-
-			?>
-
+		?>
 
 			<span class="desc"><?php _e( "Enter RSS feed URL's for blogs you would like to attach to this group. Any future posts on these blogs will show on the group activity stream. Seperate URL's with commas.", 'bp-groups-externalblogs' ) ?></span>
 			<p>
@@ -108,22 +102,27 @@ if ( class_exists('BP_Group_Extension' ) ) {
 				<textarea name="blogfeeds" id="blogfeeds"><?php echo implode( ', ', array_map( 'esc_url', (array) groups_get_groupmeta( bp_get_current_group_id(), 'blogfeeds' ) ) ); ?></textarea>
 			</p>
 			<input type="submit" name="save" value="<?php _e( "Update Feed URL's", 'bp-groups-externalblogs' ) ?>" />
-			<?php
-			wp_nonce_field( 'groups_edit_save_' . $this->slug );
+			<?php wp_nonce_field( 'groups_edit_save_' . $this->slug ); ?>
+
+		<?php
 		}
 
-
 		function edit_screen_save( $group_id = null ) {
-			if ( !isset( $_POST['save'] ) )
+			if ( ! isset( $_POST['save'] ) ) {
 				return false;
+			}
+
 			check_admin_referer( 'groups_edit_save_' . $this->slug );
+
 			$existing_feeds = (array) groups_get_groupmeta( bp_get_current_group_id(), 'blogfeeds' );
 			$unfiltered_feeds = explode( ',', $_POST['blogfeeds'] );
+
 			foreach( (array) $unfiltered_feeds as $blog_feed ) {
 				if ( ! empty( $blog_feed ) ) {
 					$blog_feeds[] = esc_url_raw( trim( $blog_feed ) );
 				}
 			}
+
 			/* Loop and find any feeds that have been removed, so we can delete activity stream items */
 			if ( ! empty( $existing_feeds ) ) {
 				foreach( (array) $existing_feeds as $feed ) {
@@ -132,6 +131,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 					}
 				}
 			}
+
 			if ( $removed  ) {
 				foreach( (array) $removed as $feed ) {
 					$existing = bp_activity_get( array(
@@ -170,17 +170,20 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			groups_update_groupmeta( bp_get_current_group_id(), 'fetchtime', $_POST['fetch-time'] );
 			groups_update_groupmeta( bp_get_current_group_id(), 'blogfeeds', $blog_feeds );
 			groups_update_groupmeta( bp_get_current_group_id(), 'bp_groupblogs_lastupdate', gmdate( "Y-m-d H:i:s" ) );
+
 			/* Re-fetch */
 			bp_groupblogs_fetch_group_feeds( bp_get_current_group_id() );
 			bp_core_add_message( __( 'External blog feeds updated successfully!', 'bp-groups-externalblogs' ) );
 			bp_core_redirect( bp_get_group_permalink( groups_get_current_group() ) . '/admin/' . $this->slug );
 		}
+
 		/* We don't need display functions since the group activity stream handles it all. */
 		function display( $group_id = null ) {}
 		function widget_display() {}
 	}
 
 	bp_register_group_extension( 'Group_External_Blogs' );
+
 
 	function bp_groupblogs_fetch_group_feeds( $group_id = false ) {
 		if ( empty( $group_id ) ) {
@@ -193,14 +196,11 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			$group = new BP_Groups_Group( $group_id );
 		}
 
-		if ( !$group ) {
+		if ( ! $group ) {
 			return false;
 		}
 
 		$group_blogs = groups_get_groupmeta( $group_id, 'blogfeeds' );
-
-		/* Set the visibility */
-		$hide_sitewide = ( 'public' != $group->status ) ? true : false;
 
 		foreach ( (array) $group_blogs as $feed_url ) {
 			$feed_url = trim( $feed_url );
@@ -222,7 +222,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 			$rss = fetch_feed( trim( $feed_url ) );
 
-			if (!is_wp_error($rss) ) {
+			if ( ! is_wp_error($rss) ) {
 				$maxitems = $rss->get_item_quantity( 10 );
 				$rss_items = $rss->get_items( 0, $maxitems );
 
@@ -251,10 +251,11 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			return false;
 		}
 
+		/* Set the visibility */
+		$hide_sitewide = ( 'public' != $group->status ) ? true : false;
 
 		/* Record found blog posts in activity streams */
 		foreach ( (array) $items as $post_date => $post ) {
-
 			$activity_action = sprintf( __( 'Blog: %s from %s in the group %s', 'bp-groups-externalblogs' ), '<a class="feed-link" href="' . esc_attr( $post['link'] ) . '">' . esc_attr( $post['title'] ) . '</a>', '<a class="feed-author" href="' . esc_attr( $post['blogurl'] ) . '">' . esc_attr( $post['blogname'] ) . '</a>', '<a href="' . bp_get_group_permalink( $group ) . '">' . esc_attr( $group->name ) . '</a>' );
 
 			$activity_content = '<div>' . strip_tags( bp_create_excerpt( $post['description'], 175 ) ) . '</div>';
@@ -262,7 +263,14 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 			/* Fetch an existing activity_id if one exists. */
 			// backpat
-			$id = bp_activity_get_activity_id( array( 'user_id' => false, 'action' => $activity_action, 'component' => 'groups', 'type' => 'exb', 'item_id' => $group_id, 'secondary_item_id' => wp_hash( $post['blogurl'] ) ) );
+			$id = bp_activity_get_activity_id( array(
+				'user_id' => false,
+				'action' => $activity_action,
+				'component' => 'groups',
+				'type' => 'exb',
+				'item_id' => $group_id,
+				'secondary_item_id' => wp_hash( $post['blogurl'] )
+			) );
 
 			// new method
 			if ( empty( $id ) ) {
@@ -310,70 +318,70 @@ if ( class_exists('BP_Group_Extension' ) ) {
 	}
 
 	/* Add a filter option to the filter select box on group activity pages */
-	function bp_groupblogs_add_filter() { ?>
-		<option value="exb"><?php _e( 'External Blogs', 'bp-groups-externalblogs' ) ?></option><?php
+	function bp_groupblogs_add_filter() {
+	?>
+
+		<option value="exb"><?php _e( 'External Blogs', 'bp-groups-externalblogs' ) ?></option>
+
+	<?php
 	}
 	add_action( 'bp_group_activity_filter_options', 'bp_groupblogs_add_filter' );
 	add_action( 'bp_activity_filter_options', 'bp_groupblogs_add_filter' );
-
 
 	/* Fetch group  posts after 30 mins expires and someone hits the group page */
 	function bp_groupblogs_refetch() {
 		$last_refetch = groups_get_groupmeta( bp_get_current_group_id(), 'bp_groupblogs_lastupdate' );
 		$meta = groups_get_groupmeta( bp_get_current_group_id(), 'fetchtime' );
 
-		$fetch_time = !empty( $meta ) ? $meta : '30' ;
+		$fetch_time = ! empty( $meta ) ? $meta : '30' ;
 
-		if ( strtotime( gmdate( "Y-m-d H:i:s" ) ) >= strtotime( '+' .$fetch_time. ' minutes', strtotime( $last_refetch ) ) )
+		if ( strtotime( gmdate( "Y-m-d H:i:s" ) ) >= strtotime( '+' .$fetch_time. ' minutes', strtotime( $last_refetch ) ) ) {
 			add_action( 'wp_footer', '_bp_groupblogs_refetch' );
+		}
 
 	}
 	add_action( 'groups_screen_group_home', 'bp_groupblogs_refetch' );
 
-
 	/* Refetch the latest group posts via AJAX so we don't stall a page load. */
 	function _bp_groupblogs_refetch() {
+		groups_update_groupmeta( bp_get_current_group_id(), 'bp_groupblogs_lastupdate', gmdate( "Y-m-d H:i:s" ) );
 	?>
 
 		<script type="text/javascript">
 			jQuery(document).ready( function() {
-
 				jQuery.post( ajaxurl, {
 					action: 'refetch_groupblogs',
 					'group_id': <?php echo bp_get_current_group_id() ?>
 				},
 				function(response){
-
 				});
 			});
-		</script><?php
-		groups_update_groupmeta( bp_get_current_group_id(), 'bp_groupblogs_lastupdate', gmdate( "Y-m-d H:i:s" ) );
-	}
+		</script>
 
+	<?php
+	}
 
 	/* Refresh via an AJAX post for the group */
 	function bp_groupblogs_ajax_refresh() {
-
 		bp_groupblogs_fetch_group_feeds( $_POST['group_id'] );
-
 	}
 	add_action( 'wp_ajax_refetch_groupblogs', 'bp_groupblogs_ajax_refresh' );
-
 
 	function bp_groupblogs_cron_refresh() {
 		global $bp, $wpdb;
 
 		$group_ids = $wpdb->get_col( $wpdb->prepare( "SELECT group_id FROM " . $bp->groups->table_name_groupmeta . " WHERE meta_key = 'blogfeeds'" ) );
 
-		foreach( $group_ids as $group_id )
+		foreach( $group_ids as $group_id ) {
 			bp_groupblogs_fetch_group_feeds( $group_id );
+		}
 	}
 	add_action( 'bp_groupblogs_cron', 'bp_groupblogs_cron_refresh' );
 }
 
 
 // Add a filter option groups avatar
-function bp_groupblogs_avatar_type($var) {
+function bp_groupblogs_avatar_type( $var ) {
 	global $activities_template;
 
 	if ( $activities_template->activity->type == "exb" ) {
@@ -385,8 +393,7 @@ function bp_groupblogs_avatar_type($var) {
 add_action( 'bp_get_activity_avatar_object_groups', 'bp_groupblogs_avatar_type');
 add_action( 'bp_get_activity_avatar_object_activity', 'bp_groupblogs_avatar_type');
 
-
-function bp_groupblogs_avatar_id($var) {
+function bp_groupblogs_avatar_id( $var ) {
 	global $activities_template;
 
 	if ( $activities_template->activity->type == "exb" ) {
@@ -394,7 +401,6 @@ function bp_groupblogs_avatar_id($var) {
 	}
 
 	return $var;
-
 }
 add_action( 'bp_get_activity_avatar_item_id', 'bp_groupblogs_avatar_id');
 
