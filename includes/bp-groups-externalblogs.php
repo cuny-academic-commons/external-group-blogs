@@ -1,16 +1,25 @@
 <?php
-/* Group blog extension using the BuddyPress group extension API */
 if ( class_exists('BP_Group_Extension' ) ) {
-
+	/**
+	 * External Group Blogs interface with BP Group Extension API.
+	 */
 	class Group_External_Blogs extends BP_Group_Extension {
-		function __construct() {
+		/**
+		 * Constructor.
+		 */
+		public function __construct() {
 			$this->name = __( 'External Blogs', 'bp-groups-externalblogs' );
 			$this->slug = 'external-blog-feeds';
 			$this->create_step_position = 21;
 			$this->enable_nav_item = false;
 		}
 
-		function create_screen( $group_id = null ) {
+		/**
+		 * Create screen.
+		 *
+		 * @param int $group_id The group ID.
+		 */
+		public function create_screen( $group_id = null ) {
 			if ( ! bp_is_group_creation_step( $this->slug ) ) {
 				return false;
 			}
@@ -52,6 +61,11 @@ if ( class_exists('BP_Group_Extension' ) ) {
 		<?php
 		}
 
+		/**
+		 * Save method for our extension during group creation.
+		 *
+		 * @param int $group_id The group ID.
+		 */
 		public function create_screen_save( $group_id = null ) {
 			check_admin_referer( 'groups_create_save_' . $this->slug );
 
@@ -70,7 +84,12 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			bp_groupblogs_fetch_group_feeds( bp_get_current_group_id() );
 		}
 
-		function edit_screen( $group_id = null ) {
+		/**
+		 * Edit screen.
+		 *
+		 * @param int $group_id The group ID.
+		 */
+		public function edit_screen( $group_id = null ) {
 			if ( ! bp_is_group_admin_screen( $this->slug ) ) {
 				return false;
 			}
@@ -107,7 +126,12 @@ if ( class_exists('BP_Group_Extension' ) ) {
 		<?php
 		}
 
-		function edit_screen_save( $group_id = null ) {
+		/**
+		 * Save method for our extension during edits.
+		 *
+		 * @param int $group_id The group ID.
+		 */
+		public function edit_screen_save( $group_id = null ) {
 			if ( ! isset( $_POST['save'] ) ) {
 				return false;
 			}
