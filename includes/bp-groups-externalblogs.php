@@ -201,9 +201,6 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			bp_core_redirect( bp_get_group_permalink( groups_get_current_group() ) . '/admin/' . $this->slug );
 		}
 
-		/* We don't need display functions since the group activity stream handles it all. */
-		function display( $group_id = null ) {}
-		function widget_display() {}
 	}
 
 	bp_register_group_extension( 'Group_External_Blogs' );
