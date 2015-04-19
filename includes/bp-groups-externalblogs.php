@@ -227,6 +227,8 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 		$group_blogs = groups_get_groupmeta( $group_id, 'blogfeeds' );
 
+		$items = array();
+
 		foreach ( (array) $group_blogs as $feed_url ) {
 			$feed_url = trim( $feed_url );
 			if ( empty( $feed_url ) ) {
@@ -269,7 +271,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			}
 		}
 
-		if ( $items ) {
+		if ( ! empty( $items ) ) {
 			ksort( $items );
 			$items = array_reverse( $items, true );
 		} else {
