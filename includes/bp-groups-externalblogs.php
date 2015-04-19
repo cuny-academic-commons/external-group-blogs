@@ -406,7 +406,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 	function bp_groupblogs_cron_refresh() {
 		global $bp, $wpdb;
 
-		$group_ids = $wpdb->get_col( $wpdb->prepare( "SELECT group_id FROM " . $bp->groups->table_name_groupmeta . " WHERE meta_key = 'blogfeeds'" ) );
+		$group_ids = $wpdb->get_col( "SELECT group_id FROM " . $bp->groups->table_name_groupmeta . " WHERE meta_key = 'blogfeeds'" );
 
 		foreach( $group_ids as $group_id ) {
 			bp_groupblogs_fetch_group_feeds( $group_id );
