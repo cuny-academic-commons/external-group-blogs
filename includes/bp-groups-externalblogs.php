@@ -445,6 +445,10 @@ add_action( 'bp_get_activity_avatar_object_activity', 'bp_groupblogs_avatar_type
 function bp_groupblogs_avatar_id( $var ) {
 	global $activities_template;
 
+	if ( empty( $activities_template->activity->type ) ) {
+		return $var;
+	}
+
 	if ( $activities_template->activity->type == "exb" ) {
 		return $activities_template->activity->item_id;
 	}
