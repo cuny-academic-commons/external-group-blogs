@@ -140,6 +140,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 
 			$existing_feeds = (array) groups_get_groupmeta( bp_get_current_group_id(), 'blogfeeds' );
 			$unfiltered_feeds = explode( ',', $_POST['blogfeeds'] );
+			$blog_feeds = array();
 
 			foreach( (array) $unfiltered_feeds as $blog_feed ) {
 				if ( ! empty( $blog_feed ) ) {
