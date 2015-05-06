@@ -428,6 +428,10 @@ if ( class_exists('BP_Group_Extension' ) ) {
 function bp_groupblogs_avatar_type( $var ) {
 	global $activities_template;
 
+	if ( empty( $activities_template->activity->type ) ) {
+		return $var;
+	}
+
 	if ( $activities_template->activity->type == "exb" ) {
 		return 'group';
 	} else {
