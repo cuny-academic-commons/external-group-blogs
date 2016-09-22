@@ -22,6 +22,9 @@ New posts will automatically be pulled every hour, or every 30 minutes if someon
 
 == Changelog ==
 
+= 1.6.1 =
+* Fix PHP notice
+
 = 1.6.0 =
 * Better RSS validation before parsing a feed
 * Update a group's RSS feeds when a user visits the group homepage after a certain, configurable interval
