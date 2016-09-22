@@ -1,9 +1,9 @@
 === BuddyPress External Group Blogs ===
-Contributors: apeatling, modemlooper, boonebgorges, cuny-academic-commons
+Contributors: apeatling, modemlooper, boonebgorges, r-a-y, cuny-academic-commons
 Tags: buddypress, groups, blogs, external-blogs, feeds, aggregation
 Requires at least: WordPress 3.5 / BuddyPress 1.7
-Tested up to: WordPress 4.1.x / BuddyPress 2.2.x
-Stable Tag: 1.6.0
+Tested up to: WordPress 4.6 / BuddyPress 2.6
+Stable Tag: 1.6.1
 
 == Description ==
 
