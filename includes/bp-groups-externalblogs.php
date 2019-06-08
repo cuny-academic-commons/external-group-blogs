@@ -13,6 +13,13 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			$this->create_step_position = 21;
 			$this->enable_nav_item = false;
 		}
+		
+		private function log($message,$var=''){
+			global $bp_geb_debug;
+			if(isset($bp_geb_debug)&&$bp_geb_debug instanceof bp_geb_debug ){
+				$bp_geb_debug->debug($message,$var);
+			}
+		}
 
 		/**
 		 * Create screen.
@@ -156,8 +163,8 @@ if ( class_exists('BP_Group_Extension' ) ) {
 					}
 				}
 			}
-
-			if ( $removed  ) {
+			# this trigger undefined var warning
+			if ( isset($removed)  ) {
 				foreach( (array) $removed as $feed ) {
 					$existing = bp_activity_get( array(
 						'user_id' => false,
@@ -202,10 +209,15 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			bp_core_redirect( bp_get_group_permalink( groups_get_current_group() ) . '/admin/' . $this->slug );
 		}
 
-	}
+	} // end class
 
 	bp_register_group_extension( 'Group_External_Blogs' );
-
+	
+	function bp_groupblogs_filter_short_cache( $seconds ) {
+		return 60;
+	}
+	
+	
 	/**
 	 * Function to fetch group feeds and save RSS entries as BP activity items.
 	 *
@@ -233,22 +245,51 @@ if ( class_exists('BP_Group_Extension' ) ) {
 		foreach ( (array) $group_blogs as $feed_url ) {
 			$feed_url = trim( $feed_url );
 			if ( empty( $feed_url ) ) {
+				bp_geb_m_debug('[bp_groupblogs_fetch_group_feeds] Feed URL empty');
 				continue;
 			}
 
+			/*
+			 * Tumblr Specific Fix
+			 */
+			$args =array();
+			$bypass = FALSE;
+			if(  stristr( $feed_url, 'tumblr.com/' )!==FALSE ){
+				$bypass = TRUE;
+				add_filter( 'wp_feed_cache_transient_lifetime' , 'bp_groupblogs_filter_short_cache' ); 
+				$args['user-agent']='GoogleBot/4.51';
+				$args['cookies']['pfg']='f1a5834399eeee1c85506760a5acbdb488884ff4cc755abc1cf5a923c182c525%23%7B%22eu_resident%22%3A1%2C%22exp%22%3A1558355685%7D%235789485527';				
+			}
+			
 			// Make sure the feed is accessible
-			$test = wp_remote_get( $feed_url );
-
+			$test = wp_remote_get( $feed_url ,$args );
+			bp_geb_m_debug('[bp_groupblogs_fetch_group_feeds] feed url',$feed_url);
+			
+			bp_geb_m_debug('[bp_groupblogs_fetch_group_feeds] feed url',$test);
 			if ( is_wp_error( $test ) ) {
+				bp_geb_m_debug('[bp_groupblogs_fetch_group_feeds] wp error',$test);
 				continue;
 			}
 
 			try { $rss = new SimpleXmlElement( $test['body'] ); }
 			catch( Exception $e ){
+	            bp_geb_m_debug('[bp_groupblogs_fetch_group_feeds] Exception detected',$e);
 				continue;
 			}
 
+			
+			bp_geb_m_debug('Doing fetch_feed', trim( $feed_url ));
 			$rss = fetch_feed( trim( $feed_url ) );
+				
+			if($bypass){
+				// The "normal" SimplePie fetch will not work however we already 
+				// have the data.
+				$rss = new SimplePie();
+				$rss->set_raw_data($test['body']);
+				$rss->init();
+				$rss->handle_content_type();
+			}
+			
 
 			if ( ! is_wp_error($rss) ) {
 				$maxitems = $rss->get_item_quantity( 10 );
@@ -378,6 +419,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 	 * Refetch RSS feeds via AJAX in the footer of a group homepage.
 	 */
 	function _bp_groupblogs_refetch() {
+		bp_geb_m_debug('AJAX refresh by cron setup for '.bp_get_current_group_id(),time(),TRUE);
 		groups_update_groupmeta( bp_get_current_group_id(), 'bp_groupblogs_lastupdate', gmdate( "Y-m-d H:i:s" ) );
 	?>
 
@@ -408,12 +450,18 @@ if ( class_exists('BP_Group_Extension' ) ) {
 	 */
 	function bp_groupblogs_cron_refresh() {
 		global $bp, $wpdb;
-
+		
+		bp_geb_m_debug('refresh by cron',time());
+		
 		$group_ids = $wpdb->get_col( "SELECT group_id FROM " . $bp->groups->table_name_groupmeta . " WHERE meta_key = 'blogfeeds'" );
 
+		$n=0;
 		foreach( $group_ids as $group_id ) {
 			bp_groupblogs_fetch_group_feeds( $group_id );
+			++$n;
 		}
+		
+		bp_geb_m_debug($n . ' refreshed by cron',time(),TRUE);
 	}
 	add_action( 'bp_groupblogs_cron', 'bp_groupblogs_cron_refresh' );
 }
@@ -487,3 +535,17 @@ function bp_groupblogs_filter_get_permalink( $retval, $activity ) {
 	return $retval;
 }
 add_filter( 'bp_activity_get_permalink', 'bp_groupblogs_filter_get_permalink', 10, 2 );
+
+function bp_geb_m_debug($message,$var='',$flushtofile=FALSE){
+	if(!_BP_GEB_DEBUG_ON_){
+		return; //only try to log when it is enabled
+	}
+	global $bp_geb_debug;
+	if(!isset($bp_geb_debug)||!($bp_geb_debug instanceof bp_geb_debug) ){
+		$bp_geb_debug = new bp_geb_debug();
+	}
+	$bp_geb_debug->debug($message,$var);
+	if($flushtofile){
+		$bp_geb_debug->log_all();
+	}
+}

@@ -16,6 +16,13 @@ Author URI: http://profiles.wordpress.org/apeatling/
  * Only load the plugin functions if BuddyPress is loaded and initialized.
  */
 function bp_groupblogs_init() {
+	if(!defined( '_BP_GEB_DEBUG_ON_' )){
+		define('_BP_GEB_DEBUG_ON_',FALSE);
+	}
+	if(!defined( '_BP_GEB_FILE_' )){
+		define('_BP_GEB_FILE_', dirname( __FILE__ ) . '/debug.log');
+	}
+	require( dirname( __FILE__ ) . '/includes/bp-geb-debug.php' );
 	require( dirname( __FILE__ ) . '/includes/bp-groups-externalblogs.php' );
 }
 add_action( 'bp_init', 'bp_groupblogs_init' );
