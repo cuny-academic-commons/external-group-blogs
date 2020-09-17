@@ -342,6 +342,8 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			}
 		}
 
+		groups_update_groupmeta( $group_id, 'last_activity', bp_core_current_time() );
+
 		return $items;
 	}
 
