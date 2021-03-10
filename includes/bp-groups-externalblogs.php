@@ -339,6 +339,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 				// save rss guid as activity meta
 				bp_activity_update_meta( $aid, 'exb_guid', $post['guid'] );
 				bp_activity_update_meta( $aid, 'exb_feedurl', $post['feedurl'] );
+				groups_update_groupmeta( $group_id, 'last_activity', bp_core_current_time() );
 			}
 		}
 
