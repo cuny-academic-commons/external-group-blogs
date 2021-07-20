@@ -2,8 +2,8 @@
 Contributors: apeatling, modemlooper, boonebgorges, r-a-y, cuny-academic-commons
 Tags: buddypress, groups, blogs, external-blogs, feeds, aggregation
 Requires at least: WordPress 3.5 / BuddyPress 1.7
-Tested up to: WordPress 4.6 / BuddyPress 2.6
-Stable Tag: 1.6.1
+Tested up to: WordPress 5.8 / BuddyPress 9.0.0
+Stable Tag: 1.6.2
 
 == Description ==
 
@@ -21,6 +21,9 @@ New posts will automatically be pulled every hour, or every 30 minutes if someon
  4. Blogs can be added to an existing group by visiting that group's admin menu.
 
 == Changelog ==
+
+= 1.6.2 = 
+* Improve updating of 'last_activity' when importing RSS item.
 
 = 1.6.1 =
 * Fix PHP notice
