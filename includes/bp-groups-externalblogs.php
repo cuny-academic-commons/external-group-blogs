@@ -278,6 +278,7 @@ if ( class_exists('BP_Group_Extension' ) ) {
 		$hide_sitewide = ( 'public' != $group->status ) ? true : false;
 
 		/* Record found blog posts in activity streams */
+		$update_last_activity = false;
 		foreach ( (array) $items as $post_date => $post ) {
 			$activity_action = sprintf( __( 'Blog: %s from %s in the group %s', 'bp-groups-externalblogs' ), '<a class="feed-link" href="' . esc_attr( $post['link'] ) . '">' . esc_attr( $post['title'] ) . '</a>', '<a class="feed-author" href="' . esc_attr( $post['blogurl'] ) . '">' . esc_attr( $post['blogname'] ) . '</a>', '<a href="' . bp_get_group_permalink( $group ) . '">' . esc_attr( $group->name ) . '</a>' );
 
@@ -319,6 +320,8 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			/* Record or update in activity streams. */
 			// Skip if it already exists
 			if ( empty( $id ) ) {
+				$update_last_activity = true;
+
 				$aid = groups_record_activity( array(
 					'id' => $id,
 					'user_id' => false,
@@ -337,7 +340,9 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			}
 		}
 
-		groups_update_groupmeta( $group_id, 'last_activity', bp_core_current_time() );
+		if ( $update_last_activity ) {
+			groups_update_groupmeta( $group_id, 'last_activity', bp_core_current_time() );
+		}
 
 		return $items;
 	}
