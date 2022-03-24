@@ -243,11 +243,6 @@ if ( class_exists('BP_Group_Extension' ) ) {
 				continue;
 			}
 
-			try { $rss = new SimpleXmlElement( $test['body'] ); }
-			catch( Exception $e ){
-				continue;
-			}
-
 			$rss = fetch_feed( trim( $feed_url ) );
 
 			if ( ! is_wp_error($rss) ) {
