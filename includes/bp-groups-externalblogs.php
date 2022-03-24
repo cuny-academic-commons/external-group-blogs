@@ -158,36 +158,46 @@ if ( class_exists('BP_Group_Extension' ) ) {
 			}
 
 			if ( $removed  ) {
-				foreach( (array) $removed as $feed ) {
-					$existing = bp_activity_get( array(
-						'user_id' => false,
-						'component' => 'groups',
-						'type' => 'exb',
-						'item_id' => bp_get_current_group_id(),
-						'update_meta_cache' => false,
-						'display_comments' => false,
-						'meta_query' => array( array (
-							'key'   => 'exb_feedurl',
-							'value' => trim( $feed ),
-						) )
-					 ) );
+				/**
+				 * Determines whether activity items associated with a deleted feed should be deleted from the activity stream.
+				 *
+				 * @since 1.6.3
+				 *
+				 * @param bool   $delete_feed_items Default false.
+				 * @param string $feed              Feed URL.
+				 */
+				if ( apply_filters( 'external_group_blogs_delete_items_from_removed_feed', false, $feed ) ) {
+					foreach( (array) $removed as $feed ) {
+						$existing = bp_activity_get( array(
+							'user_id' => false,
+							'component' => 'groups',
+							'type' => 'exb',
+							'item_id' => bp_get_current_group_id(),
+							'update_meta_cache' => false,
+							'display_comments' => false,
+							'meta_query' => array( array (
+								'key'   => 'exb_feedurl',
+								'value' => trim( $feed ),
+							) )
+						 ) );
 
-					// only delete items matching the feed
-					if ( ! empty( $existing['activities'] ) ) {
-						$aids = wp_list_pluck( $existing['activities'], 'id' );
-						foreach ( $aids as $aid ) {
+						// only delete items matching the feed
+						if ( ! empty( $existing['activities'] ) ) {
+							$aids = wp_list_pluck( $existing['activities'], 'id' );
+							foreach ( $aids as $aid ) {
+								bp_activity_delete( array(
+									'id' => $aid
+								) );
+							}
+
+						// old way - delete all feed items matching the group
+						} else {
 							bp_activity_delete( array(
-								'id' => $aid
+								'item_id' => bp_get_current_group_id(),
+								'component' => 'groups',
+								'type' => 'exb'
 							) );
 						}
-
-					// old way - delete all feed items matching the group
-					} else {
-						bp_activity_delete( array(
-							'item_id' => bp_get_current_group_id(),
-							'component' => 'groups',
-							'type' => 'exb'
-						) );
 					}
 				}
 			}
